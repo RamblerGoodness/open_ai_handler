@@ -1,6 +1,6 @@
 # OpenAIHandler
 
-This Python script, `open_ai_handler.py`, is a handler for OpenAI's GPT-3 model. It is designed to facilitate the interaction with the model by managing the conversation history and the API key. This is meant to be a easy to start from base for your A.I. projects.
+This Python script, `open_ai_handler.py`, is a handler for OpenAI's GPT-3 model. It is designed to facilitate the interaction with the model by managing the conversation history and the API key. This is meant to be a easy-start for your A.I. projects.
 
 ## Features
 
