@@ -1,0 +1,3 @@
+Create your function definitions in this folder as it's own json file.
+The file name should be the same as the function name.
+the ai will load the functions if there are any.
