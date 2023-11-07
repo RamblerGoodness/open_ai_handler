@@ -8,7 +8,7 @@ class OpenAIHandler:
     conversation = []
     functions = []
     temp = 0.0
-    model = "gpt-3.5-1106"
+    model = "gpt-3.5-turbo"
 
     def __init__(self, key=None):
         if self.key is None:
