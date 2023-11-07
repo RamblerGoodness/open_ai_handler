@@ -1,8 +1,11 @@
 {
-    "name": "helloworld",
-    "description": "Prints hello world to the console",
-    "parameters":{
-        "type": "object",
-        "properties": {}
+    "type": "function",
+    "function": {
+        "name": "hello_world",
+        "description": "Prints hello world to the console",
+        "parameters": {
+            "type": "object",
+            "properties": {}
+        }
     }
 }

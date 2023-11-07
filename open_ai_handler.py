@@ -11,7 +11,7 @@ class OpenAIHandler:
     conversation = []
     functions = []
     temp = 0.0
-    model = "gpt-3.5-turbo"
+    model = "gpt-3.5-turbo-1106"
 
     def __init__(self, key=None):
         if key == None:
@@ -28,54 +28,70 @@ class OpenAIHandler:
                     except: 
                         print("Error loading function " + file)
                         continue
+        for fun in self.functions:
+            print("Loaded function " + fun["function"]["name"])
 
     def message(self, prompt):
+        
+        self.conversation.append({
+            "role": "user",
+            "content": prompt
+        })
+        
+        response = None
 
-        self.conversation.append({"role": "user", "content": prompt})
-
+        
         response = openai.ChatCompletion.create(
             model=self.model,
             messages=self.conversation,
             temperature=self.temp,
-            tools= self.functions,
+            tools=self.functions,
+            tool_choice= "auto"
         )
 
-        if "function_call" in response["choices"][0]["message"]:
-            self.conversation.append({"role": "system", "content": response["choices"][0]["message"]["function_call"]})
-            chosen_function = eval(response.choices[0].message.function_call.name)
-            params = json.loads(response.choices[0].message.function_call.arguments)
-            response = self.function_return(chosen_function, params)
-            self.conversation.append({"role": "system", "content": response["choices"][0]["message"]["content"]}) 
+        self.conversation.append(response["choices"][0]["message"])
+
+        if 'tool_calls' in response["choices"][0]["message"]:
+            tool_call = response["choices"][0]["message"]["tool_calls"][0]
+            function_name = eval(tool_call["function"]["name"])
+            function_args = json.loads(tool_call["function"]["arguments"])
+            content = function_name(**function_args)
+            
+            while "tool_calls" in response["choices"][0]["message"]:
+                self.conversation.append({
+                    "tool_call_id": tool_call["id"],
+                    "role": "tool",
+                    "name": tool_call["function"]["name"],
+                    "content": content
+                })
+
+                response = openai.ChatCompletion.create(
+                    model=self.model,
+                    messages=self.conversation,
+                    temperature=self.temp,
+                    tools=self.functions,
+                    tool_choice="auto"
+                )
+            
+            return response["choices"][0]["message"]["content"]
+
+
 
         else:
-            self.conversation.append({"role": "system", "content": response["choices"][0]["message"]["content"]})
-
-
-        return response["choices"][0]["message"]["content"]
+            return response["choices"][0]["message"]["content"]
     
-    def function_return(self, function, params):
-
-        self.conversation.append( {"role": "function", "name": function, "content": function(**params)})
-
-        response = openai.ChatCompletion.create(
-            model=self.model,
-            message={"function_return": function(params)},
-            temperature=self.temp,
-            max_tokens=2000,
-            functions=self.functions,
-            function_call = "auto"
-        )
-
-        if "function_call" in response["choices"][0]["message"]:
-            self.conversation.append({"role": "system", "content": response["choices"][0]["message"]["function_call"]})
-            chosen_function = eval(response.choices[0].message.function_call.name)
-            params = json.loads(response.choices[0].message.function_call.arguments)
-            response = self.function_return(chosen_function, params)
-
-        else:
-            return response
+    
 
 
 #----------------------------------------#
-# Define functions here
+# Define functions here:
+# after you define a function, add a 
+# description of it to the functions folder
+#----------------------------------------#
+
+def hello_world():
+    print("Hello World!")
+    return "Hello World!"
+
+
 #----------------------------------------#
