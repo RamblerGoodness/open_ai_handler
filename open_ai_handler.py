@@ -2,24 +2,32 @@ import openai
 import os
 import json
 
-
+#----------------------------------------#
+# OpenAIHandler
+# This class handles the OpenAI API.
+#----------------------------------------#
 class OpenAIHandler:
-    
+    key = None
     conversation = []
     functions = []
     temp = 0.0
     model = "gpt-3.5-turbo"
 
     def __init__(self, key=None):
-        if self.key is None:
+        if key == None:
             raise Exception("OPENAI_KEY environment variable is not set")
         else:
+            self.key = key
             openai.api_key = self.key
         
         for file in os.listdir("functions"):
             if file.endswith(".json"):
                 with open("functions/" + file, "r") as f:
-                    self.functions.append(json.load(f))
+                    try:
+                        self.functions.append(json.load(f))
+                    except: 
+                        print("Error loading function " + file)
+                        continue
 
     def message(self, prompt):
 
@@ -29,8 +37,7 @@ class OpenAIHandler:
             model=self.model,
             messages=self.conversation,
             temperature=self.temp,
-            functions=self.functions,
-            function_call = "auto"
+            tools= self.functions,
         )
 
         if "function_call" in response["choices"][0]["message"]:
@@ -67,3 +74,8 @@ class OpenAIHandler:
 
         else:
             return response
+
+
+#----------------------------------------#
+# Define functions here
+#----------------------------------------#

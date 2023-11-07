@@ -1,0 +1,8 @@
+{
+    "name": "helloworld",
+    "description": "Prints hello world to the console",
+    "parameters":{
+        "type": "object",
+        "properties": {}
+    }
+}
