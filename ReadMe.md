@@ -21,3 +21,25 @@ To use this script, initialize the `OpenAIHandler` class with your OpenAI API ke
 ```python
 handler = OpenAIHandler(key="your-api-key")
 response = handler.message("Hello, world!")
+```
+
+## Example
+
+Included is a helloworld.py example where you can prompt open_ai from your console.
+
+```python
+
+from open_ai_handler import OpenAIHandler as handler
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+api = os.getenv("OPENAI_KEY")
+ai = handler(key=api)
+
+while True:
+    prompt = input("You: ")
+    print("Bot: " + ai.message(prompt))
+
+```
